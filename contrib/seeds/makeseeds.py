@@ -31,7 +31,6 @@ PATTERN_AGENT = re.compile(r"^(/DCGCore:2.(0|1|99).(0|1|99)/)$")
 
 def parseline(line):
     sline = line.split()
-#    print(sline)
     if len(sline) < 11:
        return None
     m = PATTERN_IPV4.match(sline[0])
