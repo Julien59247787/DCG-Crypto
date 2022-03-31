@@ -470,7 +470,7 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
     /*if (IsInitialBlockDownload())
         throw JSONRPCError(RPC_CLIENT_IN_INITIAL_DOWNLOAD, "DailyCrypto is downloading blocks...");
-    */
+    */ 
     static unsigned int nTransactionsUpdatedLast;
 
     if (!lpval.isNull()) {
