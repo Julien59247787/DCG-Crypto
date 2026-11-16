@@ -16,6 +16,8 @@
 #include "hash.h"
 #include "wallet/dcg_legacyhd.h"
 
+#include <thread>
+
 #include "checkpoints.h"
 #include "coincontrol.h"
 #include "evo/providertx.h"
@@ -458,10 +460,25 @@ bool CWallet::Unlock(const CKeyingMaterial& vMasterKeyIn)
         fDecryptionThoroughlyChecked = true;
     }
 
-    // DCG : conversion des cles HD DCG 1.x/2.x au premier deverrouillage
+    // DCG : conversion des cles HD DCG 1.x/2.x au premier deverrouillage, puis re-parcours de la chaine en tache de fond
+    // (les transactions recues pendant que le wallet etait verrouille sous 3.0 n'etaient pas encore reconnues).
     if (fDcgLegacyHD && !fDcgLegacyHDConverted) {
-        LOCK(cs_wallet);
-        DcgConvertLegacyHD(&vMasterKeyIn);
+        {
+            LOCK(cs_wallet);
+            DcgConvertLegacyHD(&vMasterKeyIn);
+        }
+        if (fDcgLegacyHDConverted) {
+            std::thread([this]() {
+                WalletRescanReserver reserver(this);
+                if (!reserver.reserve()) {
+                    LogPrintf("DCG : re-parcours apres conversion HD reporte (un autre re-parcours est en cours)\n");
+                    return;
+                }
+                LogPrintf("DCG : re-parcours de la chaine apres conversion HD...\n");
+                RescanFromTime(TIMESTAMP_MIN, reserver, true /* update */);
+                LogPrintf("DCG : re-parcours apres conversion HD termine\n");
+            }).detach();
+        }
     }
 
     NotifyStatusChanged(this);
