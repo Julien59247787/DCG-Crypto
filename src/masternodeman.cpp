@@ -5,6 +5,7 @@
 
 #include "masternodeman.h"
 
+#include "activemasternode.h"
 #include "addrman.h"
 #include "evo/deterministicmns.h"
 #include "fs.h"
@@ -838,8 +839,9 @@ int CMasternodeMan::ProcessMNBroadcast(CNode* pfrom, CMasternodeBroadcast& mnb)
     }
 
     // if it matches our MN pubkey, then we've been remotely activated
-    if (mnb.pubKeyMasternode == activeMasternode.pubKeyMasternode && mnb.protocolVersion == PROTOCOL_VERSION) {
-        activeMasternode.EnableHotColdMasterNode(mnb.vin, mnb.addr);
+    // DCG : principal ou masternode supplementaire (activemasternode.conf)
+    if (mnb.protocolVersion == PROTOCOL_VERSION) {
+        DcgEnableIfOurs(mnb.pubKeyMasternode, mnb.vin, mnb.addr);
     }
 
     // Relay only if we are synchronized and if the mnb address is not local.
@@ -1195,7 +1197,7 @@ void ThreadCheckMasternodes()
                 // check if we should activate or ping every few minutes,
                 // start right after sync is considered to be done
                 if (c % (MasternodePingSeconds()/2) == 0)
-                    activeMasternode.ManageStatus();
+                    DcgManageAllMasternodes(); // DCG
 
                 if (c % (MasternodePingSeconds()/5) == 0) {
                     masternodePayments.CleanPaymentList(mnodeman.CheckAndRemove(), mnodeman.GetBestHeight());

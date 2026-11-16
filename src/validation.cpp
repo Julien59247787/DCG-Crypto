@@ -10,6 +10,8 @@
 
 #include "validation.h"
 
+#include "dcg.h"
+
 #include "addrman.h"
 #include "blocksignature.h"
 #include "budget/budgetmanager.h"
@@ -815,6 +817,10 @@ double ConvertBitsToDouble(unsigned int nBits)
 
 CAmount GetBlockValue(int nHeight)
 {
+    // DCG : recompenses de la chaine DCG (historique v1.0.8.2 puis Reborn, voir dcg.h)
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN)
+        return DcgBlockValue(nHeight);
+
     // Set V5.5 upgrade block for regtest as well as testnet and mainnet
     const int nLast = Params().GetConsensus().vUpgrades[Consensus::UPGRADE_V5_5].nActivationHeight;
 
@@ -851,6 +857,10 @@ CAmount GetBlockValue(int nHeight)
 
 int64_t GetMasternodePayment(int nHeight)
 {
+    // DCG : 0,075 DCG puis 60 % de la valeur du bloc a partir de Reborn
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN)
+        return DcgMasternodePayment(nHeight, DcgBlockValue(nHeight));
+
     if (nHeight > Params().GetConsensus().vUpgrades[Consensus::UPGRADE_V5_5].nActivationHeight) {
         return Params().GetConsensus().nNewMNBlockReward;
     }
@@ -1072,6 +1082,10 @@ bool CheckTxInputs(const CTransaction& tx, CValidationState& state, const CCoins
                 return state.Invalid(false, REJECT_INVALID, "bad-txns-premature-spend-of-coinbase-coinstake",
                         strprintf("tried to spend coinbase/coinstake at depth %d", nSpendHeight - coin.nHeight));
         }
+
+        // DCG Reborn : sorties des adresses gelees (ancienne generation) non depensables
+        if (::Params().NetworkIDString() == CBaseChainParams::MAIN && DcgIsFrozenInput(coin.out.scriptPubKey, nSpendHeight))
+            return state.DoS(100, false, REJECT_INVALID, "bad-txns-frozen-inputs");
 
         // Check for negative or overflow input values
         nValueIn += coin.out.nValue;
@@ -1636,6 +1650,14 @@ static bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockInd
     CAmount nExpectedMint = GetBlockValue(pindex->nHeight);
     if (!isPoSBlock)
         nExpectedMint += nFees;
+
+    // DCG Reborn : le coinstake du bloc d'activation porte les 4 sorties de reserve imposees
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN && pindex->nHeight == DcgRebornHeight()) {
+        if (!isPoSBlock || block.vtx.size() < 2 || !DcgCheckRebornReserve(*block.vtx[1]))
+            return state.DoS(100, error("%s: bloc Reborn sans les sorties de reserve", __func__),
+                             REJECT_INVALID, "bad-reborn-reserve");
+        nExpectedMint += DcgRebornReserveTotal();
+    }
 
     //Check that the block does not overmint
     CAmount nBudgetAmt = 0;     // If this is a superblock, amount to be paid to the winning proposal, otherwise 0
@@ -2839,7 +2861,9 @@ bool CheckWork(const CBlock& block, const CBlockIndex* const pindexPrev)
         double n1 = ConvertBitsToDouble(block.nBits);
         double n2 = ConvertBitsToDouble(nBitsRequired);
 
-        if (std::abs(n1 - n2) > n1 * 0.5)
+        // DCG : tolerance elargie (n1 * 2) sur la phase PoW de la chaine DCG
+        const double nTolerance = (Params().NetworkIDString() == CBaseChainParams::MAIN) ? 2.0 : 0.5;
+        if (std::abs(n1 - n2) > n1 * nTolerance)
             return error("%s : incorrect proof of work (DGW pre-fork) - %f %f %f at %d", __func__, std::abs(n1 - n2), n1, n2, pindexPrev->nHeight + 1);
 
         return true;

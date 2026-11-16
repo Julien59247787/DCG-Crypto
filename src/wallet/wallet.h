@@ -1010,6 +1010,24 @@ public:
     bool Unlock(const SecureString& strWalletPassphrase, bool anonimizeOnly = false);
     bool Unlock(const CKeyingMaterial& vMasterKeyIn);
 
+    // DCG : wallets HD des versions DCG 1.x / 2.x (schema Dash : graine BIP44 m/44'/1617'/compte'/change/index,
+    // cles publiques dans les entrees "hdpubkey", cles privees derivees a la demande). La 3.0 recalcule les cles
+    // privees et les enregistre comme cles classiques : a l'ouverture (wallet non chiffre) ou au premier deverrouillage.
+    struct DcgLegacyHDKey {
+        CPubKey pubkey;
+        uint32_t nAccount;
+        uint32_t nChange;
+        uint32_t nChild;
+    };
+    bool fDcgLegacyHD{false};
+    bool fDcgLegacyHDCrypted{false};
+    bool fDcgLegacyHDConverted{false};
+    uint256 dcgLegacyHDId;
+    std::vector<unsigned char> vchDcgLegacyHDSeed; // en clair, ou chiffree avec la cle maitre (IV = id)
+    std::vector<DcgLegacyHDKey> vDcgLegacyHDKeys;
+    bool DcgCheckLegacyHDMasterKey(const CKeyingMaterial& vMasterKeyIn) const;
+    bool DcgConvertLegacyHD(const CKeyingMaterial* pMasterKey);
+
     bool ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase, const SecureString& strNewWalletPassphrase);
     bool EncryptWallet(const SecureString& strWalletPassphrase);
 

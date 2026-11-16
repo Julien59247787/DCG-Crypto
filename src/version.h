@@ -17,7 +17,8 @@ static const int PROTOCOL_VERSION = 70927;
 static const int INIT_PROTO_VERSION = 209;
 
 //! disconnect from peers older than this proto version
-static const int MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT = 70926;
+// DCG : la 3.0 accepte les noeuds DCG 2.0 (70918) pendant la transition ; activer SPORK_15 pour les ecarter.
+static const int MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT = 70918;
 static const int MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT = 70927;
 
 //! Version where BIP155 was introduced

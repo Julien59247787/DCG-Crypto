@@ -188,6 +188,8 @@ struct Params {
     int64_t nProposalEstablishmentTime;
     int nStakeMinAge;
     int nStakeMinDepth;
+    int nStakeMinDepthV2;           // DCG : profondeur de stake reduite (relance 2026)
+    int nHeightStakeMinDepthV2;     // DCG : hauteur d'activation de nStakeMinDepthV2
     int64_t nTargetTimespan;
     int64_t nTargetTimespanV2;
     int64_t nTargetSpacing;
@@ -241,7 +243,13 @@ struct Params {
         if (!NetworkUpgradeActive(contextHeight, Consensus::UPGRADE_V3_4))
             return (utxoFromBlockTime + nStakeMinAge <= contextTime);
         // with stake modifier V2+, we require the utxo to be nStakeMinDepth deep in the chain
-        return (contextHeight - utxoFromBlockHeight >= nStakeMinDepth);
+        return (contextHeight - utxoFromBlockHeight >= StakeMinDepth(contextHeight));
+    }
+
+    // DCG : profondeur minimale de stake selon la hauteur (200, puis 60 a partir de nHeightStakeMinDepthV2)
+    int StakeMinDepth(const int nHeight) const
+    {
+        return (nHeightStakeMinDepthV2 > 0 && nHeight >= nHeightStakeMinDepthV2) ? nStakeMinDepthV2 : nStakeMinDepth;
     }
 
 

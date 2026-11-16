@@ -699,6 +699,28 @@ UniValue getmasternodestatus(const JSONRPCRequest& request)
     bool fLegacyMN = (activeMasternode.vin != nullopt);
     bool fDeterministicMN = (activeMasternodeManager != nullptr);
 
+    // DCG : plusieurs masternodes servis par ce demon -> tableau (un objet par masternode)
+    if (!fDeterministicMN && !vDcgExtraMasternodes.empty()) {
+        auto mnToJson = [](const std::string& strAlias, const CActiveMasternode& amn) {
+            UniValue o(UniValue::VOBJ);
+            if (!strAlias.empty()) o.pushKV("alias", strAlias);
+            if (amn.vin != nullopt) {
+                o.pushKV("txhash", amn.vin->prevout.hash.ToString());
+                o.pushKV("outputidx", (uint64_t)amn.vin->prevout.n);
+                CMasternode* p = mnodeman.Find(amn.vin->prevout);
+                if (p) o.pushKV("addr", EncodeDestination(p->pubKeyCollateralAddress.GetID()));
+            }
+            o.pushKV("netaddr", amn.service.ToString());
+            o.pushKV("status", amn.GetStatus());
+            o.pushKV("message", amn.GetStatusMessage());
+            return o;
+        };
+        UniValue arr(UniValue::VARR);
+        arr.push_back(mnToJson("", activeMasternode));
+        for (const auto& p : vDcgExtraMasternodes) arr.push_back(mnToJson(p->strAlias, p->mn));
+        return arr;
+    }
+
     if (!fLegacyMN && !fDeterministicMN) {
         throw JSONRPCError(RPC_MISC_ERROR, _("Active Masternode not initialized."));
     }

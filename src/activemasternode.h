@@ -7,6 +7,11 @@
 #define ACTIVEMASTERNODE_H
 
 #include "key.h"
+
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
 #include "evo/deterministicmns.h"
 #include "operationresult.h"
 #include "sync.h"
@@ -111,6 +116,23 @@ public:
 
     void GetKeys(CKey& privKeyMasternode, CPubKey& pubKeyMasternode) const;
 };
+
+// DCG : plusieurs masternodes (legacy) servis par un meme demon et une meme IP:port.
+// Fichier <datadir>/activemasternode.conf, une ligne par masternode : "alias masternodeprivkey".
+// Si -masternodeprivkey est absent, la premiere ligne devient le masternode principal (activeMasternode).
+struct DcgExtraMasternode {
+    std::string strAlias;
+    CActiveMasternode mn;
+};
+extern std::vector<std::unique_ptr<DcgExtraMasternode>> vDcgExtraMasternodes;
+// Lit activemasternode.conf (alias, cle) ; renvoie false et strError si une ligne est invalide.
+bool DcgReadActiveMasternodeConf(std::vector<std::pair<std::string, std::string>>& vEntries, std::string& strError);
+// Initialise les masternodes supplementaires (meme adresse de service que le principal).
+OperationResult DcgInitExtraMasternodes(const std::vector<std::pair<std::string, std::string>>& vEntries);
+// ManageStatus() du masternode principal et de tous les supplementaires.
+void DcgManageAllMasternodes();
+// Activation distante : une annonce (mnb) correspond a l'une de nos cles.
+void DcgEnableIfOurs(const CPubKey& pubKeyMasternode, const CTxIn& vin, const CService& addr);
 
 // Compatibility code: get vin and keys for either legacy or deterministic masternode
 bool GetActiveMasternodeKeys(CTxIn& vin, Optional<CKey>& key, CBLSSecretKey& blsKey);

@@ -13,6 +13,9 @@
 
 #include "wallet/wallet.h"
 
+#include "hash.h"
+#include "wallet/dcg_legacyhd.h"
+
 #include "checkpoints.h"
 #include "coincontrol.h"
 #include "evo/providertx.h"
@@ -436,6 +439,11 @@ bool CWallet::Unlock(const CKeyingMaterial& vMasterKeyIn)
             throw std::runtime_error("Error unlocking wallet: some keys decrypt but not all. Your wallet file may be corrupt.");
         }
 
+        // DCG : un wallet HD DCG 1.x/2.x peut n'avoir aucune cle chiffree classique ; la cle maitre se valide
+        // alors en dechiffrant la graine HD (son empreinte doit egaler l'identifiant de la chaine).
+        if (!keyPass && !keyFail && fDcgLegacyHDCrypted && DcgCheckLegacyHDMasterKey(vMasterKeyIn))
+            keyPass = true;
+
         if (keyFail || !keyPass)
             return false;
 
@@ -450,8 +458,70 @@ bool CWallet::Unlock(const CKeyingMaterial& vMasterKeyIn)
         fDecryptionThoroughlyChecked = true;
     }
 
+    // DCG : conversion des cles HD DCG 1.x/2.x au premier deverrouillage
+    if (fDcgLegacyHD && !fDcgLegacyHDConverted) {
+        LOCK(cs_wallet);
+        DcgConvertLegacyHD(&vMasterKeyIn);
+    }
+
     NotifyStatusChanged(this);
     return true;
+}
+
+bool CWallet::DcgCheckLegacyHDMasterKey(const CKeyingMaterial& vMasterKeyIn) const
+{
+    if (!fDcgLegacyHDCrypted || vchDcgLegacyHDSeed.empty()) return false;
+    CKeyingMaterial seed;
+    if (!DecryptSecret(vMasterKeyIn, vchDcgLegacyHDSeed, dcgLegacyHDId, seed)) return false;
+    return !seed.empty() && Hash(seed.begin(), seed.end()) == dcgLegacyHDId;
+}
+
+bool CWallet::DcgConvertLegacyHD(const CKeyingMaterial* pMasterKey)
+{
+    AssertLockHeld(cs_wallet);
+    if (!fDcgLegacyHD || fDcgLegacyHDConverted) return true;
+
+    CKeyingMaterial seed;
+    if (fDcgLegacyHDCrypted) {
+        if (!pMasterKey || !DecryptSecret(*pMasterKey, vchDcgLegacyHDSeed, dcgLegacyHDId, seed))
+            return error("%s: graine HD DCG non dechiffrable", __func__);
+    } else {
+        seed.assign(vchDcgLegacyHDSeed.begin(), vchDcgLegacyHDSeed.end());
+    }
+    if (seed.empty() || Hash(seed.begin(), seed.end()) != dcgLegacyHDId)
+        return error("%s: graine HD DCG invalide", __func__);
+
+    // m/44'/1617'
+    CExtKey masterKey, purposeKey, coinKey;
+    masterKey.SetSeed(seed.data(), seed.size());
+    masterKey.Derive(purposeKey, 44 | 0x80000000);
+    purposeKey.Derive(coinKey, DCG_BIP44_COIN_TYPE | 0x80000000);
+
+    int nAdded = 0, nKnown = 0, nMismatch = 0;
+    std::map<std::pair<uint32_t, uint32_t>, CExtKey> mapChangeKeys; // (compte, change) -> m/44'/1617'/compte'/change
+    for (const DcgLegacyHDKey& k : vDcgLegacyHDKeys) {
+        if (HaveKey(k.pubkey.GetID())) { nKnown++; continue; }
+        const auto idx = std::make_pair(k.nAccount, k.nChange);
+        auto it = mapChangeKeys.find(idx);
+        if (it == mapChangeKeys.end()) {
+            CExtKey accountKey, changeKey;
+            coinKey.Derive(accountKey, k.nAccount | 0x80000000);
+            accountKey.Derive(changeKey, k.nChange);
+            it = mapChangeKeys.emplace(idx, changeKey).first;
+        }
+        CExtKey childKey;
+        it->second.Derive(childKey, k.nChild);
+        if (childKey.key.GetPubKey() != k.pubkey) { nMismatch++; continue; }
+        if (!AddKeyPubKey(childKey.key, k.pubkey)) {
+            return error("%s: echec d'enregistrement d'une cle HD DCG", __func__);
+        }
+        nAdded++;
+    }
+    LogPrintf("DCG : conversion HD DCG 1.x/2.x : %d cle(s) ajoutee(s), %d deja connue(s), %d incoherente(s)\n",
+              nAdded, nKnown, nMismatch);
+    fDcgLegacyHDConverted = true;
+    MarkDirty();
+    return nMismatch == 0;
 }
 
 bool CWallet::ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase, const SecureString& strNewWalletPassphrase)
@@ -2173,9 +2243,10 @@ CAmount CWallet::GetColdStakingBalance() const
 
 CAmount CWallet::GetStakingBalance(const bool fIncludeColdStaking) const
 {
+    const int nStakeMinDepth = Params().GetConsensus().StakeMinDepth(GetLastBlockHeightLockWallet() + 1);
     return std::max(CAmount(0), loopTxsBalance(
-            [fIncludeColdStaking](const uint256& id, const CWalletTx& pcoin, CAmount& nTotal) {
-        if (pcoin.IsTrusted() && pcoin.GetDepthInMainChain() >= Params().GetConsensus().nStakeMinDepth) {
+            [fIncludeColdStaking, nStakeMinDepth](const uint256& id, const CWalletTx& pcoin, CAmount& nTotal) {
+        if (pcoin.IsTrusted() && pcoin.GetDepthInMainChain() >= nStakeMinDepth) {
             nTotal += pcoin.GetAvailableCredit();       // available coins
             nTotal -= pcoin.GetStakeDelegationCredit(); // minus delegated coins, if any
             nTotal -= pcoin.GetLockedCredit();          // minus locked coins, if any
@@ -2703,7 +2774,7 @@ bool CWallet::StakeableCoins(std::vector<CStakeableOutput>* pCoins)
             continue;
 
         // Check min depth requirement for stake inputs
-        if (nDepth < Params().GetConsensus().nStakeMinDepth) continue;
+        if (nDepth < Params().GetConsensus().StakeMinDepth(GetLastBlockHeight() + 1)) continue;
 
         const CBlockIndex* pindex = nullptr;
         for (unsigned int index = 0; index < pcoin->tx->vout.size(); index++) {
@@ -3572,6 +3643,11 @@ DBErrors CWallet::LoadWallet(bool& fFirstRunRet)
             // User will be prompted to unlock wallet the next operation
             // the requires a new key.
         }
+    }
+
+    // DCG : wallet HD DCG 1.x/2.x non chiffre -> conversion des cles des l'ouverture
+    if (fDcgLegacyHD && !fDcgLegacyHDCrypted) {
+        DcgConvertLegacyHD(nullptr);
     }
 
     // This wallet is in its first run if all of these are empty

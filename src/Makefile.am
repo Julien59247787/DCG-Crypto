@@ -174,6 +174,7 @@ BITCOIN_CORE_H = \
   consensus/consensus.h \
   consensus/merkle.h \
   consensus/validation.h \
+  dcg.h \
   consensus/tx_verify.h \
   consensus/zerocoin_verify.h \
   consensus/params.h \
@@ -328,6 +329,7 @@ BITCOIN_CORE_H = \
   validationinterface.h \
   version.h \
   wallet/hdchain.h \
+  wallet/dcg_legacyhd.h \
   wallet/rpcwallet.h \
   wallet/scriptpubkeyman.h \
   destination_io.h \

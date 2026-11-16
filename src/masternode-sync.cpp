@@ -387,7 +387,7 @@ bool CMasternodeSync::SyncWithNode(CNode* pnode, bool fLegacyMnObsolete)
             SwitchToNextAsset();
 
             // Try to activate our masternode if possible
-            activeMasternode.ManageStatus();
+            DcgManageAllMasternodes(); // DCG
             return false;
         }
 
@@ -396,7 +396,7 @@ bool CMasternodeSync::SyncWithNode(CNode* pnode, bool fLegacyMnObsolete)
             (RequestedMasternodeAttempt >= MASTERNODE_SYNC_THRESHOLD * 3 || GetTime() - nAssetSyncStarted > MASTERNODE_SYNC_TIMEOUT * 5)) {
             // maybe there is no budgets at all, so just finish syncing
             SwitchToNextAsset();
-            activeMasternode.ManageStatus();
+            DcgManageAllMasternodes(); // DCG
             return false;
         }
 

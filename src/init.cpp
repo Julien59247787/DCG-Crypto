@@ -111,7 +111,7 @@ CClientUIInterface uiInterface;  // Declared but not defined in guiinterface.h
 /**
  * The PID file facilities.
  */
-const char * const PIVX_PID_FILENAME = "pivx.pid";
+const char * const PIVX_PID_FILENAME = "dailycrypto.pid";  // DCG
 
 fs::path GetPidFile()
 {

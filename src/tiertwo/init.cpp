@@ -4,6 +4,7 @@
 
 #include "tiertwo/init.h"
 
+#include "activemasternode.h"
 #include "budget/budgetdb.h"
 #include "evo/evodb.h"
 #include "evo/evonotificationinterface.h"
@@ -263,9 +264,21 @@ bool InitActiveMN()
                 LogPrintf("-- ERROR: %s\n", strError);
                 return UIError(strError);
             }
-            auto res = initMasternode(gArgs.GetArg("-masternodeprivkey", ""), gArgs.GetArg("-masternodeaddr", ""),
-                                      true);
+            // DCG : masternodes supplementaires (activemasternode.conf) ; la 1re ligne sert de principal
+            // si -masternodeprivkey n'est pas renseigne.
+            std::vector<std::pair<std::string, std::string>> vDcgEntries;
+            std::string strDcgError;
+            if (!DcgReadActiveMasternodeConf(vDcgEntries, strDcgError)) return UIError(strDcgError);
+            std::string strMainKey = gArgs.GetArg("-masternodeprivkey", "");
+            if (strMainKey.empty() && !vDcgEntries.empty()) {
+                strMainKey = vDcgEntries.front().second;
+                vDcgEntries.erase(vDcgEntries.begin());
+            }
+            auto res = initMasternode(strMainKey, gArgs.GetArg("-masternodeaddr", ""), true);
             if (!res) { return UIError(res.getError()); }
+            auto resExtra = DcgInitExtraMasternodes(vDcgEntries);
+            if (!resExtra) { return UIError(resExtra.getError()); }
+            LogPrintf("DCG : %d masternode(s) servi(s) par ce demon\n", 1 + (int)vDcgExtraMasternodes.size());
         }
     }
 

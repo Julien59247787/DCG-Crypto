@@ -5,6 +5,7 @@
 // file COPYING or https://www.opensource.org/licenses/mit-license.php.
 
 #include "blockassembler.h"
+#include "dcg.h"
 
 #include "amount.h"
 #include "blocksignature.h"
@@ -94,6 +95,12 @@ bool SolveProofOfStake(CBlock* pblock, CBlockIndex* pindexPrev, CWallet* pwallet
     // Create coinbase tx and add masternode/budget payments
     CMutableTransaction txCoinbase = NewCoinbase(pindexPrev->nHeight + 1);
     FillBlockPayee(txCoinbase, txCoinStake, pindexPrev, true);
+
+    // DCG Reborn : sorties de reserve imposees dans le coinstake du bloc d'activation
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN && pindexPrev->nHeight + 1 == DcgRebornHeight()) {
+        for (const auto& p : DcgRebornReserve())
+            txCoinStake.vout.emplace_back(p.second, DcgScript(p.first));
+    }
 
     // Sign coinstake
     if (!pwallet->SignCoinStake(txCoinStake)) {

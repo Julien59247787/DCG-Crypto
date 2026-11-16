@@ -18,6 +18,11 @@
 #include "tiertwo/tiertwo_sync_state.h"
 #include "validation.h"
 
+#include "fs.h"
+#include "util/system.h"
+
+#include <sstream>
+
 // Keep track of the active Masternode
 CActiveDeterministicMasternodeManager* activeMasternodeManager{nullptr};
 
@@ -519,4 +524,82 @@ bool GetActiveMasternodeKeys(CTxIn& vin, Optional<CKey>& key, CBLSSecretKey& bls
     key = Optional<CKey>(sk);
     blsKey.Reset();
     return true;
+}
+
+
+/********* DCG : plusieurs masternodes legacy par demon *********/
+
+std::vector<std::unique_ptr<DcgExtraMasternode>> vDcgExtraMasternodes;
+
+bool DcgReadActiveMasternodeConf(std::vector<std::pair<std::string, std::string>>& vEntries, std::string& strError)
+{
+    vEntries.clear();
+    const fs::path path = GetDataDir() / "activemasternode.conf";
+    fsbridge::ifstream stream(path);
+    if (!stream.good()) return true; // fichier absent : aucun masternode supplementaire
+
+    std::string line;
+    int nLine = 0;
+    while (std::getline(stream, line)) {
+        nLine++;
+        if (!line.empty() && line.back() == '\r') line.pop_back();
+        std::istringstream iss(line);
+        std::string alias, key;
+        if (!(iss >> alias)) continue;           // ligne vide
+        if (alias[0] == '#') continue;           // commentaire
+        if (!(iss >> key)) {
+            strError = strprintf("activemasternode.conf ligne %d : format attendu \"alias masternodeprivkey\"", nLine);
+            return false;
+        }
+        vEntries.emplace_back(alias, key);
+    }
+    return true;
+}
+
+OperationResult DcgInitExtraMasternodes(const std::vector<std::pair<std::string, std::string>>& vEntries)
+{
+    LOCK(cs_main);
+    vDcgExtraMasternodes.clear();
+    for (const auto& e : vEntries) {
+        CKey key;
+        CPubKey pubkey;
+        if (!CMessageSigner::GetKeysFromSecret(e.second, key, pubkey)) {
+            return errorOut(strprintf("activemasternode.conf : cle invalide pour %s", e.first));
+        }
+        if (pubkey == activeMasternode.pubKeyMasternode) continue; // deja le masternode principal
+        auto p = std::make_unique<DcgExtraMasternode>();
+        p->strAlias = e.first;
+        p->mn.pubKeyMasternode = pubkey;
+        p->mn.privKeyMasternode = key;
+        p->mn.service = activeMasternode.service; // meme IP:port que le masternode principal
+        if (g_tiertwo_sync_state.IsBlockchainSynced()) {
+            CMasternode* pmn = mnodeman.Find(pubkey);
+            if (pmn) p->mn.EnableHotColdMasterNode(pmn->vin, pmn->addr);
+        }
+        LogPrintf("DCG : masternode supplementaire %s charge\n", e.first);
+        vDcgExtraMasternodes.emplace_back(std::move(p));
+    }
+    return {true};
+}
+
+void DcgManageAllMasternodes()
+{
+    activeMasternode.ManageStatus();
+    for (auto& p : vDcgExtraMasternodes) p->mn.ManageStatus();
+}
+
+void DcgEnableIfOurs(const CPubKey& pubKeyMasternode, const CTxIn& vinIn, const CService& addrIn)
+{
+    CTxIn vin(vinIn);
+    CService addr(addrIn);
+    if (pubKeyMasternode == activeMasternode.pubKeyMasternode) {
+        activeMasternode.EnableHotColdMasterNode(vin, addr);
+        return;
+    }
+    for (auto& p : vDcgExtraMasternodes) {
+        if (pubKeyMasternode == p->mn.pubKeyMasternode) {
+            p->mn.EnableHotColdMasterNode(vin, addr);
+            return;
+        }
+    }
 }

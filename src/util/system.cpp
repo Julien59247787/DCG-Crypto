@@ -78,7 +78,7 @@
 #include <CoreFoundation/CoreFoundation.h>
 #endif
 
-const char * const PIVX_CONF_FILENAME = "pivx.conf";
+const char * const PIVX_CONF_FILENAME = "dailycrypto.conf";  // DCG
 const char * const PIVX_MASTERNODE_CONF_FILENAME = "masternode.conf";
 
 
@@ -538,7 +538,7 @@ fs::path GetDefaultDataDir()
 // Unix: ~/.pivx
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "PIVX";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "DailyCrypto";  // DCG
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -550,10 +550,10 @@ fs::path GetDefaultDataDir()
     // Mac
     pathRet /= "Library/Application Support";
     TryCreateDirectories(pathRet);
-    return pathRet / "PIVX";
+    return pathRet / "DailyCrypto";  // DCG
 #else
     // Unix
-    return pathRet / ".pivx";
+    return pathRet / ".dailycrypto";  // DCG
 #endif
 #endif
 }

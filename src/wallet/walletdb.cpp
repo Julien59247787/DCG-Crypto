@@ -19,6 +19,8 @@
 #include "utiltime.h"
 #include "wallet/wallet.h"
 #include "wallet/walletutil.h"
+#include "wallet/dcg_legacyhd.h"
+#include "hash.h"
 
 #include <atomic>
 
@@ -559,9 +561,49 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
                 return false;
             }
         } else if (strType == DBKeys::HDCHAIN) { // Regular key chain counter
+            // DCG : un wallet DCG 1.x/2.x non chiffre stocke ici sa graine (format different) : on la reconnait
+            // a son identifiant (= Hash(graine)) avant d'essayer le format PIVX.
+            {
+                CDataStream ssDcg(ssValue);
+                DcgLegacyHDChainRecord rec;
+                bool fDcg = false;
+                try {
+                    ssDcg >> rec;
+                    fDcg = ssDcg.empty() && rec.nVersion == 1 && !rec.fCrypted && !rec.vchSeed.empty() &&
+                           Hash(rec.vchSeed.begin(), rec.vchSeed.end()) == rec.id;
+                } catch (const std::exception&) {
+                    fDcg = false;
+                }
+                if (fDcg) {
+                    pwallet->fDcgLegacyHD = true;
+                    pwallet->fDcgLegacyHDCrypted = false;
+                    pwallet->dcgLegacyHDId = rec.id;
+                    pwallet->vchDcgLegacyHDSeed = rec.vchSeed;
+                    return true;
+                }
+            }
             CHDChain chain;
             ssValue >> chain;
             pwallet->GetScriptPubKeyMan()->SetHDChain(chain, true);
+        } else if (strType == "chdchain") {
+            // DCG : graine HD chiffree d'un wallet DCG 1.x/2.x
+            DcgLegacyHDChainRecord rec;
+            ssValue >> rec;
+            pwallet->fDcgLegacyHD = true;
+            pwallet->fDcgLegacyHDCrypted = true;
+            pwallet->dcgLegacyHDId = rec.id;
+            pwallet->vchDcgLegacyHDSeed = rec.vchSeed;
+        } else if (strType == "hdpubkey") {
+            // DCG : cle publique HD d'un wallet DCG 1.x/2.x (cle privee recalculee depuis la graine)
+            CPubKey vchPubKey;
+            ssKey >> vchPubKey;
+            DcgLegacyHDPubKeyRecord rec;
+            ssValue >> rec;
+            if (rec.extPubKey.pubkey != vchPubKey) {
+                strErr = "Error reading wallet database: DCG hdpubkey corrupt";
+                return false;
+            }
+            pwallet->vDcgLegacyHDKeys.push_back({vchPubKey, rec.nAccountIndex, rec.nChangeIndex, rec.extPubKey.nChild});
         } else if (strType == DBKeys::SAP_HDCHAIN) {
             CHDChain chain;
             ssValue >> chain;
@@ -642,6 +684,11 @@ DBErrors WalletBatch::LoadWallet(CWallet* pwallet)
     try {
         int nMinVersion = 0;
         if (m_batch.Read((std::string) DBKeys::MINVERSION, nMinVersion)) {
+            // DCG : numerotation des wallets DCG 1.x/2.x (ex. 1000400) ; ces wallets ont le niveau PIVX 4.0 (FEATURE_PRE_PIVX)
+            if (nMinVersion >= DCG_LEGACY_WALLET_VERSION_MIN) {
+                LogPrintf("DCG : wallet DCG 1.x/2.x (version %d) ouvert en niveau %d\n", nMinVersion, (int)FEATURE_PRE_PIVX);
+                nMinVersion = FEATURE_PRE_PIVX;
+            }
             if (nMinVersion > CLIENT_VERSION) {
                 return DB_TOO_NEW;
             }
