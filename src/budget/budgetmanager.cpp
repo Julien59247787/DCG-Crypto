@@ -852,6 +852,10 @@ std::string CBudgetManager::GetRequiredPaymentsString(int nBlockHeight)
 
 CAmount CBudgetManager::GetTotalBudget(int nHeight)
 {
+    // DCG : pas de budget DAO cree par superbloc tant que son financement n'est pas decide (respect de la tokenomics
+    // et du plafond de 1 000 000). Sans ce garde-fou, la V5.5 jamais activee (-1) donnait 100 % de l'emission par cycle.
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN) return 0;
+
     // 100% of block reward after V5.5 upgrade
     CAmount nSubsidy = GetBlockValue(nHeight);
 
