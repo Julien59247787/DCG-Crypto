@@ -5,6 +5,8 @@
 
 #include "masternode-payments.h"
 
+#include "dcg.h"
+
 #include "chainparams.h"
 #include "evo/deterministicmns.h"
 #include "fs.h"
@@ -197,6 +199,14 @@ void DumpMasternodePayments()
 bool IsBlockValueValid(int nHeight, CAmount& nExpectedValue, CAmount nMinted, CAmount& nBudgetAmt)
 {
     const Consensus::Params& consensus = Params().GetConsensus();
+
+    // DCG : historique anterieur a Reborn valide comme en v1.0.8.2 (base PIVX 4.0.2) : sans donnees de budget,
+    // les blocs de la fenetre de superbloc (100 premiers blocs de chaque cycle) n'etaient pas controles
+    // (c'est ainsi que la premine du bloc 3 a ete acceptee). Historique fige par les points de controle.
+    if (Params().NetworkIDString() == CBaseChainParams::MAIN && nHeight < DcgRebornHeight()) {
+        if (nHeight % consensus.nBudgetCycleBlocks < 100) return true;
+        return nMinted <= nExpectedValue;
+    }
     if (!g_tiertwo_sync_state.IsSynced()) {
         //there is no budget data to use to check anything
         //super blocks will always be on these blocks, max 100 per budgeting
