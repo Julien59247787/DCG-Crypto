@@ -207,7 +207,10 @@ void CMasternodeSync::Process()
         // Check if we lost all masternodes (except the local one in case the node is a MN)
         // from sleep/wake or failure to sync originally (after spork 21, check if we lost
         // all proposals instead). If we did, resync from scratch.
-        if ((!legacy_obsolete && mnodeman.CountEnabled(true /* only_legacy */) <= 1) ||
+        // DCG : -forcesync (relance d'un reseau sans aucun masternode actif) : une synchro terminee n'est pas
+        // relancee faute de masternodes, sinon les annonces des premiers MN ne sont jamais relayees ni servies.
+        const bool fDcgForceSync = gArgs.GetBoolArg("-forcesync", false);
+        if ((!legacy_obsolete && !fDcgForceSync && mnodeman.CountEnabled(true /* only_legacy */) <= 1) ||
             (legacy_obsolete && g_budgetman.CountProposals() == 0)) {
             Reset();
         } else {
