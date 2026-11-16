@@ -1026,6 +1026,8 @@ public:
     std::vector<unsigned char> vchDcgLegacyHDSeed; // en clair, ou chiffree avec la cle maitre (IV = id)
     std::vector<DcgLegacyHDKey> vDcgLegacyHDKeys;
     bool DcgCheckLegacyHDMasterKey(const CKeyingMaterial& vMasterKeyIn) const;
+    // Un wallet HD DCG chiffre peut ne contenir aucune cle chiffree classique : on le marque chiffre a la lecture de la graine.
+    bool DcgSetLegacyHDCrypted() { return SetCrypted(); }
     bool DcgConvertLegacyHD(const CKeyingMaterial* pMasterKey);
 
     bool ChangeWalletPassphrase(const SecureString& strOldWalletPassphrase, const SecureString& strNewWalletPassphrase);

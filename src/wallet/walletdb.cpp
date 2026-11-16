@@ -593,6 +593,11 @@ bool ReadKeyValue(CWallet* pwallet, CDataStream& ssKey, CDataStream& ssValue, CW
             pwallet->fDcgLegacyHDCrypted = true;
             pwallet->dcgLegacyHDId = rec.id;
             pwallet->vchDcgLegacyHDSeed = rec.vchSeed;
+            if (!pwallet->DcgSetLegacyHDCrypted()) {
+                strErr = "Error reading wallet database: DCG encrypted HD chain in a wallet with plaintext keys";
+                return false;
+            }
+            LogPrintf("DCG : graine HD DCG chiffree trouvee (wallet chiffre)\n");
         } else if (strType == "hdpubkey") {
             // DCG : cle publique HD d'un wallet DCG 1.x/2.x (cle privee recalculee depuis la graine)
             CPubKey vchPubKey;
