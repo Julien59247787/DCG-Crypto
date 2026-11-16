@@ -74,13 +74,13 @@ SettingsFaqWidget::SettingsFaqWidget(PIVXGUI* parent, MNModel* mnModel) :
     // Set FAQ content strings
     QString introContent = formatFAQContent(
         formatFAQParagraph(
-            tr("PIVX is a form of digital online money using blockchain technology "
+            tr("DCG is a form of digital online money using blockchain technology "
                "that can be easily transferred globally, instantly, and with near "
                "zero fees. PIVX incorporates market leading security & "
                "privacy and is also the first PoS (Proof of Stake) Cryptocurrency "
                "to implement Sapling(SHIELD), a zk-SNARKs based privacy protocol.")) +
         formatFAQParagraph(
-            tr("PIVX utilizes a Proof of Stake (PoS) consensus system algorithm, "
+            tr("DCG utilizes a Proof of Stake (PoS) consensus system algorithm, "
                "allowing all owners of PIVX to participate in earning block rewards "
                "while securing the network with full node wallets, as well as to "
                "run Masternodes to create and vote on proposals.")));
@@ -88,17 +88,17 @@ SettingsFaqWidget::SettingsFaqWidget(PIVXGUI* parent, MNModel* mnModel) :
 
     QString unspendablePIVContent = formatFAQContent(
         formatFAQParagraph(
-            tr("Newly received PIVX requires 6 confirmations on the network "
+            tr("Newly received DCG requires 6 confirmations on the network "
                "to become eligible for spending which can take ~6 minutes.")) +
         formatFAQParagraph(
-            tr("Your PIVX wallet also needs to be completely synchronized "
+            tr("Your DCG wallet also needs to be completely synchronized "
                "to see and spend balances on the network.")));
     ui->labelContent_UnspendablePIV->setText(unspendablePIVContent);
 
     QString stakeContent = formatFAQContent(
         formatFAQOrderedList(
             formatFAQListItem(tr("Make sure your wallet is completely synchronized and you are using the latest release.")) +
-            formatFAQListItem(tr("You must have a balance of PIVX with a minimum of 600 confirmations.")) +
+            formatFAQListItem(tr("You must have a balance of DCG with a minimum of 600 confirmations.")) +
             formatFAQListItem(tr("Your wallet must stay online and be unlocked for staking purposes.")) +
             formatFAQListItem(tr("Once all those steps are followed staking should be enabled."))) +
         formatFAQParagraph(
@@ -136,10 +136,10 @@ SettingsFaqWidget::SettingsFaqWidget(PIVXGUI* parent, MNModel* mnModel) :
         formatFAQParagraph(
             tr("Masternode Perks:") +
             formatFAQUnorderedList(
-                formatFAQListItem(tr("Participate in PIVX Governance")) +
+                formatFAQListItem(tr("Participate in DCG Governance")) +
                 formatFAQListItem(tr("Earn Masternode Rewards")) +
                 formatFAQListItem(tr("Commodity option for future sale")) +
-                formatFAQListItem(tr("Help secure the PIVX network")))) +
+                formatFAQListItem(tr("Help secure the DCG network")))) +
         formatFAQParagraph(
             tr("Requirements:") +
             formatFAQUnorderedList(

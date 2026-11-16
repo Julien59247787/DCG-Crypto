@@ -78,7 +78,7 @@ SendWidget::SendWidget(PIVXGUI* parent) :
 
     // Uri
     ui->btnUri->setTitleClassAndText("btn-title-grey", tr("Open URI"));
-    ui->btnUri->setSubTitleClassAndText("text-subtitle", tr("Parse a PIVX URI"));
+    ui->btnUri->setSubTitleClassAndText("text-subtitle", tr("Parse a DCG URI"));
 
     // Shield coins
     ui->btnShieldCoins->setTitleClassAndText("btn-title-grey", tr("Shield Coins"));
