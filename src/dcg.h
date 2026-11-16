@@ -70,7 +70,7 @@ inline CAmount DcgRebornBlockValue(int nHeight)
 inline CAmount DcgRebornReserveTotal();
 
 // Masse monetaire a la fin du bloc Reborn - 1 (relevee sur la chaine ; sert au plafond deterministe).
-static const CAmount DCG_SUPPLY_BEFORE_REBORN = 0; // TODO : renseigner apres le bloc 326 700 (moneysupply du bloc 326 699)
+static const CAmount DCG_SUPPLY_BEFORE_REBORN = 6260366817118; // 62 603,66817118 DCG (moneysupply du bloc 326 699)
 
 // Emission theorique cumulee des blocs [Reborn, nHeight[ (hors reserve).
 inline CAmount DcgRebornEmittedBefore(int nHeight)

@@ -166,11 +166,12 @@ static MapCheckpoints mapCheckpoints = {
     { 300000, uint256S("bd9325ed9c312155b44a82301b1be7b987f0a1cccccc61bc60af1e5933ebb47e")},
     { 325730, uint256S("4abef3a5700085494de3dfc57f9f734e5e04c69119bf5e327a19f7291ba50b37")}, //!< Profondeur de stake 60 (relance 2026)
     { 325811, uint256S("8a1052b98cceb37a0dfa06c1ddfa3b4a6557c83f66515c6c90ecb6a9ff0cb569")},
+    { 326700, uint256S("4b9c32fe681b3b3020884f7055e227af404363b0c40d8b95233b342150292630")}, //!< Bloc de reserve DCG Reborn
 };
 
 static const CCheckpointData data = {
     &mapCheckpoints,
-    1794772980, // * UNIX timestamp of last checkpoint block
+    1794826185, // * UNIX timestamp of last checkpoint block
     700000,     // * total number of transactions between genesis and last checkpoint (estimation)
     1500        // * estimated number of transactions per day after checkpoint
 };
