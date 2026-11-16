@@ -278,6 +278,9 @@ public:
     SERIALIZE_METHODS(CDiskBlockIndex, obj)
     {
         int nSerVersion = s.GetVersion();
+        // DCG : le numero de version DCG 3.x (3000000) est inferieur aux seuils PIVX ci-dessus ; sans cela les entrees
+        // seraient ecrites sans en-tete et illisibles au redemarrage. On ecrit toujours au format courant.
+        if (!ser_action.ForRead() && nSerVersion < DBI_SER_VERSION_NO_ZC) nSerVersion = DBI_SER_VERSION_NO_ZC;
         if (!(s.GetType() & SER_GETHASH)) READWRITE(VARINT_MODE(nSerVersion, VarIntMode::NONNEGATIVE_SIGNED));
 
         READWRITE(VARINT_MODE(obj.nHeight, VarIntMode::NONNEGATIVE_SIGNED));
