@@ -68,14 +68,18 @@ TopBar::TopBar(PIVXGUI* _mainWindow, QWidget *parent) :
 #endif
 
     // DCG : bandeau "Daily Crypto Giveaways" + etiquette "REBORN" facon post-it (relance 2026)
-    if (QBoxLayout* topLayout = qobject_cast<QBoxLayout*>(ui->containerTop->layout())) {
+    // logo historique du site (dailycryptogiveaways) + post-it "REBORN", pose en superposition dans l'espace libre
+    // a gauche des boutons (hors layout : la hauteur de la barre et la position des soldes ne changent pas)
+    {
         QLabel* lblDcgBanner = new QLabel(ui->containerTop);
-        lblDcgBanner->setTextFormat(Qt::RichText);
-        lblDcgBanner->setText("<span style=\"font-size:18px; font-weight:600; color:#ffffff;\">Daily Crypto Giveaways</span>"
-                              "&nbsp;&nbsp;<span style=\"font-size:13px; font-weight:700; color:#002244; background-color:#ffe45c;\">&nbsp;REBORN&nbsp;</span>");
-        lblDcgBanner->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-        lblDcgBanner->setStyleSheet("background: transparent; padding: 2px 4px 6px 4px;");
-        topLayout->insertWidget(0, lblDcgBanner);
+        QPixmap pixBanner("://img-dcg-reborn-banner");
+        lblDcgBanner->setPixmap(pixBanner.scaledToHeight(92, Qt::SmoothTransformation));
+        lblDcgBanner->setToolTip("Daily Crypto Giveaways - Reborn");
+        lblDcgBanner->setStyleSheet("background: transparent;");
+        lblDcgBanner->setAttribute(Qt::WA_TransparentForMouseEvents, true);
+        lblDcgBanner->adjustSize();
+        lblDcgBanner->move(14, 4);
+        lblDcgBanner->raise();
     }
 
     std::initializer_list<QWidget*> lblTitles = {ui->labelTitle1, ui->labelTitle3, ui->labelTitle4, ui->labelTrans, ui->labelShield};

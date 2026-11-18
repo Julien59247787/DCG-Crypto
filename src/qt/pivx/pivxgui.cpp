@@ -65,7 +65,7 @@ PIVXGUI::PIVXGUI(const NetworkStyle* networkStyle, QWidget* parent) :
 
     QString windowTitle = QString::fromStdString(gArgs.GetArg("-windowtitle", ""));
     if (windowTitle.isEmpty()) {
-        windowTitle = QString{PACKAGE_NAME} + " - ";
+        windowTitle = QString{"Daily Crypto Giveaways"} + " - "; // DCG : titre historique de la fenetre (1.0.8)
         windowTitle += ((enableWallet) ? tr("Wallet") : tr("Node"));
     }
     windowTitle += " " + networkStyle->getTitleAddText();

@@ -52,11 +52,11 @@ Splash::Splash(const NetworkStyle* networkStyle) :
     ui->lblVersion->setText(QString("v") + QString::fromStdString(FormatVersionFriendly()));
 
     // DCG : etiquette "REBORN" facon post-it sur l'ecran de demarrage (relance 2026)
-    QLabel* lblDcgReborn = new QLabel("REBORN", ui->frame);
-    lblDcgReborn->setStyleSheet("background-color:#ffe45c; color:#002244; font-size:16px; font-weight:700;"
-                                "padding:4px 10px; border:1px solid #e0c040; border-radius:2px;");
+    QLabel* lblDcgReborn = new QLabel(ui->frame);
+    lblDcgReborn->setPixmap(QPixmap("://img-dcg-reborn-postit"));
+    lblDcgReborn->setStyleSheet("background: transparent;");
     lblDcgReborn->adjustSize();
-    lblDcgReborn->move(18, 18);
+    lblDcgReborn->move(160, 408); // colle sous "GIVEAWAYS" du fond historique
     lblDcgReborn->raise();
 
     // Resize window and move to center of desktop, disallow resizing
