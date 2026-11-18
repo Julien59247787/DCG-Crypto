@@ -237,10 +237,12 @@ public:
         consensus.nMaxProposalPayments = 6;
 
         // spork keys (DCG)
-        consensus.strSporkPubKey = "027dda284823ff3a9138337ccf0d7e39fef7e2d7d4abd0b9b7a24d00363ad5be8e";
-        consensus.strSporkPubKeyOld = "045cf0ccc3f5d859efd52234ec8f0a03f325ca05e5c153b7612a5b77b47646f1416ccffbd57228b9c0bedcfd2e08b5e215a990b3c1268885f7291eec05808bd288";
+        // DCG 3.0 (relance 2026) : nouvelle cle spork detenue par l'equipe de relance.
+        // L'ancienne cle (027dda...) des developpeurs d'origine est refusee : tout spork signe avec elle est ignore.
+        consensus.strSporkPubKey = "032f60ba8dfcc412635e411b7834789af646236146de3f3aebcf9935eeb997e35f";
+        consensus.strSporkPubKeyOld = "027dda284823ff3a9138337ccf0d7e39fef7e2d7d4abd0b9b7a24d00363ad5be8e";
         consensus.nTime_EnforceNewSporkKey = 1586309695;
-        consensus.nTime_RejectOldSporkKey = 4070908800;
+        consensus.nTime_RejectOldSporkKey = 1794960000;     //!> 17/11/2026 : ancienne cle refusee
 
         // height-based activations (DCG : jamais de zerocoin ni d'UTXO invalides)
         consensus.height_last_invalid_UTXO = -1;
