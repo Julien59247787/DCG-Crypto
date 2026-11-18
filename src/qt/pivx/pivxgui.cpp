@@ -213,7 +213,7 @@ void PIVXGUI::createTrayIcon(const NetworkStyle* networkStyle)
 {
 #ifndef Q_OS_MAC
     trayIcon = new QSystemTrayIcon(this);
-    QString toolTip = tr("%1 client").arg(PACKAGE_NAME) + " " + networkStyle->getTitleAddText();
+    QString toolTip = QString{"Daily Crypto Giveaways"} + " " + networkStyle->getTitleAddText(); // DCG
     trayIcon->setToolTip(toolTip);
     trayIcon->setIcon(networkStyle->getAppIcon());
     trayIcon->hide();
@@ -380,7 +380,7 @@ void PIVXGUI::messageInfo(const QString& text)
 
 void PIVXGUI::message(const QString& title, const QString& message, unsigned int style, bool* ret)
 {
-    QString strTitle = QString{PACKAGE_NAME}; // default title
+    QString strTitle = QString{"Daily Crypto Giveaways"}; // DCG : titre par defaut des notifications
     // Default to information icon
     int nNotifyIcon = Notificator::Information;
 
