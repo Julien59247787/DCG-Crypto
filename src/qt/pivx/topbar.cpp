@@ -68,15 +68,18 @@ TopBar::TopBar(PIVXGUI* _mainWindow, QWidget *parent) :
 #endif
 
     // DCG : bandeau "Daily Crypto Giveaways" + etiquette "REBORN" facon post-it (relance 2026)
-    // logo historique du site (dailycryptogiveaways) + post-it "REBORN", centre entre les soldes et le QR code
-    if (QBoxLayout* bottomLayout = qobject_cast<QBoxLayout*>(ui->bottom_container->layout())) {
-        QLabel* lblDcgBanner = new QLabel(ui->bottom_container);
+    // banniere "Daily Crypto Giveaways" sur une ligne + post-it "REBORN", a gauche dans la rangee des boutons
+    if (QBoxLayout* rowLayout = qobject_cast<QBoxLayout*>(ui->top_container_2->layout())) {
+        QLabel* lblDcgBanner = new QLabel(ui->top_container_2);
         QPixmap pixBanner("://img-dcg-reborn-banner");
-        lblDcgBanner->setPixmap(pixBanner.scaledToHeight(118, Qt::SmoothTransformation));
+        lblDcgBanner->setPixmap(pixBanner.scaledToHeight(56, Qt::SmoothTransformation));
         lblDcgBanner->setToolTip("Daily Crypto Giveaways - Reborn");
         lblDcgBanner->setStyleSheet("background: transparent;");
-        bottomLayout->insertStretch(1);
-        bottomLayout->insertWidget(2, lblDcgBanner, 0, Qt::AlignVCenter);
+        // largeur "ignoree" : la banniere se laisse rogner si la fenetre est etroite (n'impose pas de largeur minimale)
+        lblDcgBanner->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Fixed);
+        lblDcgBanner->setMinimumHeight(56);
+        lblDcgBanner->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        rowLayout->insertWidget(0, lblDcgBanner, 1);
     }
 
     std::initializer_list<QWidget*> lblTitles = {ui->labelTitle1, ui->labelTitle3, ui->labelTitle4, ui->labelTrans, ui->labelShield};
