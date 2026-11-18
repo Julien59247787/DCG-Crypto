@@ -667,6 +667,34 @@ void initZKSNARKS()
         if (fs::exists(sapling_spend) && fs::exists(sapling_output))
             fParamsFound = true;
     }
+    if (!fParamsFound) {
+        // DCG : archives portables (Windows et Linux), parametres livres dans share/pivx a cote de bin/.
+        // Il suffit de decompresser et de lancer, sans copier les parametres dans PIVXParams / .pivx-params.
+        fs::path exeDir;
+        try {
+#ifdef WIN32
+            wchar_t exeBuf[MAX_PATH] = {0};
+            if (GetModuleFileNameW(nullptr, exeBuf, MAX_PATH) > 0)
+                exeDir = fs::path(exeBuf).parent_path();
+#elif defined(__linux__)
+            exeDir = fs::read_symlink("/proc/self/exe").parent_path();
+#endif
+        } catch (...) {
+            exeDir.clear();
+        }
+        if (!exeDir.empty()) {
+            const fs::path candidates[] = {exeDir / ".." / "share" / "pivx", exeDir / "share" / "pivx", exeDir};
+            for (const fs::path& dir : candidates) {
+                if (fs::exists(dir / "sapling-spend.params") && fs::exists(dir / "sapling-output.params")) {
+                    sapling_spend = dir / "sapling-spend.params";
+                    sapling_output = dir / "sapling-output.params";
+                    fParamsFound = true;
+                    LogPrintf("Sapling parameters found next to the executable: %s\n", dir.string());
+                    break;
+                }
+            }
+        }
+    }
     if (!fParamsFound)
         throw std::runtime_error("Sapling params don't exist");
 

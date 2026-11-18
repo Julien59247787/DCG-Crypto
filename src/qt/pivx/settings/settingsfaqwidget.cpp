@@ -107,7 +107,7 @@ SettingsFaqWidget::SettingsFaqWidget(PIVXGUI* parent, MNModel* mnModel) :
                "package will be lit up and will state \"Staking Enabled\" to indicate "
                "it is staking. Using the command line interface (%1); the command %2 "
                "will confirm that staking is active.")
-                .arg("pivx-cli", "<span style=\"font-style:italic\">getstakingstatus</span>")));
+                .arg("dcg-cli", "<span style=\"font-style:italic\">getstakingstatus</span>")));
     ui->labelContent_Stake->setText(stakeContent);
 
     QString supportContent = formatFAQContent(
