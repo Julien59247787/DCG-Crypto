@@ -8,6 +8,8 @@
 
 #include "qt/pivx/splash.h"
 #include "qt/pivx/forms/ui_splash.h"
+
+#include <QLabel>
 #include "QFile"
 
 #include "interfaces/handler.h"
@@ -48,6 +50,14 @@ Splash::Splash(const NetworkStyle* networkStyle) :
     ui->layoutProgress->setProperty("cssClass", "bg-progress");
     ui->imgLogo->setProperty("cssClass", "img-splash-logo");
     ui->lblVersion->setText(QString("v") + QString::fromStdString(FormatVersionFriendly()));
+
+    // DCG : etiquette "REBORN" facon post-it sur l'ecran de demarrage (relance 2026)
+    QLabel* lblDcgReborn = new QLabel("REBORN", ui->frame);
+    lblDcgReborn->setStyleSheet("background-color:#ffe45c; color:#002244; font-size:16px; font-weight:700;"
+                                "padding:4px 10px; border:1px solid #e0c040; border-radius:2px;");
+    lblDcgReborn->adjustSize();
+    lblDcgReborn->move(18, 18);
+    lblDcgReborn->raise();
 
     // Resize window and move to center of desktop, disallow resizing
     QRect r(QPoint(), size());

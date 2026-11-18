@@ -21,6 +21,8 @@
 #include "masternode-sync.h" // for MASTERNODE_SYNC_THRESHOLD
 #include "tiertwo/tiertwo_sync_state.h"
 
+#include <QBoxLayout>
+#include <QLabel>
 #include <QPixmap>
 
 #define REQUEST_UPGRADE_WALLET 1
@@ -64,6 +66,17 @@ TopBar::TopBar(PIVXGUI* _mainWindow, QWidget *parent) :
 #else
     ui->containerTop->setProperty("cssClass", "container-top");
 #endif
+
+    // DCG : bandeau "Daily Crypto Giveaways" + etiquette "REBORN" facon post-it (relance 2026)
+    if (QBoxLayout* topLayout = qobject_cast<QBoxLayout*>(ui->containerTop->layout())) {
+        QLabel* lblDcgBanner = new QLabel(ui->containerTop);
+        lblDcgBanner->setTextFormat(Qt::RichText);
+        lblDcgBanner->setText("<span style=\"font-size:18px; font-weight:600; color:#ffffff;\">Daily Crypto Giveaways</span>"
+                              "&nbsp;&nbsp;<span style=\"font-size:13px; font-weight:700; color:#002244; background-color:#ffe45c;\">&nbsp;REBORN&nbsp;</span>");
+        lblDcgBanner->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+        lblDcgBanner->setStyleSheet("background: transparent; padding: 2px 4px 6px 4px;");
+        topLayout->insertWidget(0, lblDcgBanner);
+    }
 
     std::initializer_list<QWidget*> lblTitles = {ui->labelTitle1, ui->labelTitle3, ui->labelTitle4, ui->labelTrans, ui->labelShield};
     setCssProperty(lblTitles, "text-title-topbar");
