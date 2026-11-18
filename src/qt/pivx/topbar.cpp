@@ -71,8 +71,11 @@ TopBar::TopBar(PIVXGUI* _mainWindow, QWidget *parent) :
     // banniere "Daily Crypto Giveaways" sur une ligne + post-it "REBORN", a gauche dans la rangee des boutons
     if (QBoxLayout* rowLayout = qobject_cast<QBoxLayout*>(ui->top_container_2->layout())) {
         QLabel* lblDcgBanner = new QLabel(ui->top_container_2);
-        QPixmap pixBanner("://img-dcg-reborn-banner");
-        lblDcgBanner->setPixmap(pixBanner.scaledToHeight(56, Qt::SmoothTransformation));
+        // images deja rendues a la taille d'affichage (56 px, et 112 px pour les ecrans haute densite) : pas de reechantillonnage
+        const bool fDcgHiDpi = devicePixelRatioF() > 1.0;
+        QPixmap pixBanner(fDcgHiDpi ? "://img-dcg-reborn-banner-2x" : "://img-dcg-reborn-banner");
+        if (fDcgHiDpi) pixBanner.setDevicePixelRatio(2.0);
+        lblDcgBanner->setPixmap(pixBanner);
         lblDcgBanner->setToolTip("Daily Crypto Giveaways - Reborn");
         lblDcgBanner->setStyleSheet("background: transparent;");
         // largeur "ignoree" : la banniere se laisse rogner si la fenetre est etroite (n'impose pas de largeur minimale)

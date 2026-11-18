@@ -423,6 +423,7 @@ RES_ICONS = \
   qt/pivx/res/img/img-nav-logo.svg \
   qt/pivx/res/img/img-nav-logo-dcg.png \
   qt/pivx/res/img/img-dcg-reborn-banner.png \
+  qt/pivx/res/img/img-dcg-reborn-banner-2x.png \
   qt/pivx/res/img/reborn-postit.png \
   qt/pivx/res/img/ic-arrow-white-right.svg \
   qt/pivx/res/img/ic-expand.svg \
