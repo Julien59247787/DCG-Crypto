@@ -431,9 +431,10 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
         return error("%s : Got bad Masternode address signature", __func__);
     }
 
+    // DCG : port par defaut du reseau (6744 sur DCG) au lieu du port PIVX 51472 code en dur
     if (Params().NetworkIDString() == CBaseChainParams::MAIN) {
-        if (addr.GetPort() != 51472) return false;
-    } else if (addr.GetPort() == 51472)
+        if (addr.GetPort() != Params().GetDefaultPort()) return false;
+    } else if (addr.GetPort() == 6744)
         return false;
 
     // incorrect ping or its sigTime
