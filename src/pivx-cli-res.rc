@@ -17,13 +17,13 @@ BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
             VALUE "CompanyName",        "PIVX"
-            VALUE "FileDescription",    "dcg-cli (OSS RPC client for " PACKAGE_NAME ")"
+            VALUE "FileDescription",    "dailycrypto-cli (OSS RPC client for " PACKAGE_NAME ")"
             VALUE "FileVersion",        VER_FILEVERSION_STR
-            VALUE "InternalName",       "dcg-cli"
+            VALUE "InternalName",       "dailycrypto-cli"
             VALUE "LegalCopyright",     COPYRIGHT_STR
             VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
-            VALUE "OriginalFilename",   "dcg-cli.exe"
-            VALUE "ProductName",        "dcg-cli"
+            VALUE "OriginalFilename",   "dailycrypto-cli.exe"
+            VALUE "ProductName",        "dailycrypto-cli"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END

@@ -52,9 +52,9 @@ static int AppInitRawTx(int argc, char* argv[])
 
     if (argc < 2 || gArgs.IsArgSet("-?") || gArgs.IsArgSet("-h") || gArgs.IsArgSet("-help")) {
         // First part of help message is specific to this utility
-        std::string strUsage = PACKAGE_NAME " dcg-tx utility version " + FormatFullVersion() + "\n\n" +
-                               "Usage:  dcg-tx [options] <hex-tx> [commands]  Update hex-encoded DCG transaction\n" +
-                               "or:     dcg-tx [options] -create [commands]   Create hex-encoded DCG transaction\n" +
+        std::string strUsage = PACKAGE_NAME " dailycrypto-tx utility version " + FormatFullVersion() + "\n\n" +
+                               "Usage:  dailycrypto-tx [options] <hex-tx> [commands]  Update hex-encoded DCG transaction\n" +
+                               "or:     dailycrypto-tx [options] -create [commands]   Create hex-encoded DCG transaction\n" +
                                "\n";
 
         fprintf(stdout, "%s", strUsage.c_str());

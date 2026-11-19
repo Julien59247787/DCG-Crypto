@@ -113,11 +113,11 @@ TESTS =
 BENCHMARKS =
 
 if BUILD_BITCOIND
-  bin_PROGRAMS += dcgd
+  bin_PROGRAMS += dailycryptod
 endif
 
 if BUILD_BITCOIN_UTILS
-  bin_PROGRAMS += dcg-cli dcg-tx
+  bin_PROGRAMS += dailycrypto-cli dailycrypto-tx
 endif
 
 LIBSAPLING_H = \
@@ -667,15 +667,15 @@ nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
 # pivxd binary #
-dcgd_SOURCES = pivxd.cpp
-dcgd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-dcgd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-dcgd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+dailycryptod_SOURCES = pivxd.cpp
+dailycryptod_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+dailycryptod_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+dailycryptod_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-dcgd_SOURCES += pivxd-res.rc
+dailycryptod_SOURCES += pivxd-res.rc
 endif
-dcgd_LDADD = \
+dailycryptod_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_WALLET) \
   $(LIBBITCOIN_COMMON) \
@@ -692,19 +692,19 @@ dcgd_LDADD = \
   $(LIBRUSTZCASH) \
   $(LIBZCASH_LIBS)
 
-dcgd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(MINIUPNPC_LIBS) $(NATPMP_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(BLS_LIBS)
+dailycryptod_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(MINIUPNPC_LIBS) $(NATPMP_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(BLS_LIBS)
 
 # pivx-cli binary #
-dcg_cli_SOURCES = pivx-cli.cpp
-dcg_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
-dcg_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-dcg_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+dailycrypto_cli_SOURCES = pivx-cli.cpp
+dailycrypto_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
+dailycrypto_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+dailycrypto_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-dcg_cli_SOURCES += pivx-cli-res.rc
+dailycrypto_cli_SOURCES += pivx-cli-res.rc
 endif
 
-dcg_cli_LDADD = \
+dailycrypto_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
@@ -713,20 +713,20 @@ dcg_cli_LDADD = \
   $(LIBRUSTZCASH) \
   $(LIBZCASH_LIBS)
 
-dcg_cli_LDADD += $(BOOST_LIBS) $(EVENT_LIBS) $(BLS_LIBS)
+dailycrypto_cli_LDADD += $(BOOST_LIBS) $(EVENT_LIBS) $(BLS_LIBS)
 #
 
 # pivx-tx binary #
-dcg_tx_SOURCES = pivx-tx.cpp
-dcg_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-dcg_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-dcg_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+dailycrypto_tx_SOURCES = pivx-tx.cpp
+dailycrypto_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+dailycrypto_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+dailycrypto_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-dcg_tx_SOURCES += pivx-tx-res.rc
+dailycrypto_tx_SOURCES += pivx-tx-res.rc
 endif
 
-dcg_tx_LDADD = \
+dailycrypto_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_ZEROCOIN) \
@@ -737,7 +737,7 @@ dcg_tx_LDADD = \
   $(LIBRUSTZCASH) \
   $(LIBZCASH_LIBS)
 
-dcg_tx_LDADD += $(BOOST_LIBS) $(BLS_LIBS)
+dailycrypto_tx_LDADD += $(BOOST_LIBS) $(BLS_LIBS)
 #
 
 # bitcoinconsensus library #
