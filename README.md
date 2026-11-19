@@ -1,25 +1,30 @@
-PIVX Core integration/staging repository
-=====================================
+Daily Crypto Giveaways (DCG) Core — official repository
+=======================================================
 
-[![master Actions Status](https://github.com/PIVX-Project/PIVX/workflows/CI%20Actions%20for%20PIVX/badge.svg)](https://github.com/PIVX-Project/PIVX/actions)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/PIVX-Project/pivx?color=%235c4b7d&cacheSeconds=3600)](https://github.com/PIVX-Project/PIVX/releases)
-[![GitHub Release Date](https://img.shields.io/github/release-date/PIVX-Project/pivx?color=%235c4b7d&cacheSeconds=3600)](https://github.com/PIVX-Project/PIVX/releases)
+DCG is back: version 3.0.0 "Reborn", based on PIVX 5.6.1, continues the original 2020 Daily Crypto Giveaways project
+(same chain, same coins, same binaries `dailycrypto-qt`, `dailycryptod`, `dailycrypto-cli`).
 
-## What is PIVX?
+## Official sources
 
-PIVX is an open source community-driven cryptocurrency, focused on five main aspects:
+This repository (`Julien59247787/DCG-Crypto`, branch `dcg-3.0`) is the **official source** of DCG Core, maintained by the relaunch team.
+Only trust binaries published here, checked against the `SHA256SUMS` file of the release.
 
-(1) User Data Protection: Through the use of SHIELD, a zk-SNARKs based privacy protocol.
+| | |
+|---|---|
+| Downloads | https://github.com/Julien59247787/DCG-Crypto/releases |
+| Dashboard | https://dashboard.dailycryptogiveaways.eu |
+| Explorer | https://explorer.dailycryptogiveaways.eu |
+| Discord | https://discord.gg/ZvHB9WRTwt |
+| Seed node | `seed.dailycryptogiveaways.eu:6744` |
+| Network spork public key | `032f60ba8dfcc412635e411b7834789af646236146de3f3aebcf9935eeb997e35f` |
 
-(2) Low environmental footprint and network participation equality: Through the use of a highly developed Proof of Stake protocol.
+Copies or forks of this code are not official, even if they use the DCG name. The old `crypto-giveaways.cash` domain no longer
+belongs to the project. The team will never ask you for coins, keys or your seed in a private message.
 
-(3) Decentralized Governance System: A DAO built on top of the tier two Masternodes network, enabling a monthly community treasury, proposals submission and decentralized voting.
+## Credits
 
-(4) Fast Transactions: Through the use of fast block times and the tier two network, PIVX is committed to continue researching new and better instant transactions mechanisms.
-
-(5) Ease of Use: PIVX is determined to offer the best possible graphical interface for a core node/wallet. A full featured graphical product for new and advanced users.
-
-A lot more information and specs at [PIVX.org](https://www.pivx.org/). Join the community at [PIVX Discord](https://discordapp.com/invite/jzqVsJd).
+DCG Core is built on [PIVX Core](https://github.com/PIVX-Project/PIVX) (itself derived from Dash and Bitcoin Core) and on the
+original DCG code by the 2020 team ([Steve-Coding/DCG-Crypto](https://github.com/Steve-Coding/DCG-Crypto)). Thank you to all of them.
 
 ## License
 PIVX Core is released under the terms of the MIT license. See [COPYING](https://github.com/PIVX-Project/PIVX/blob/master/COPYING) for more information or see https://opensource.org/licenses/MIT.
