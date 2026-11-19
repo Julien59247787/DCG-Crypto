@@ -7,7 +7,7 @@ DCG is back: version 3.0.0 "Reborn", based on PIVX 5.6.1, continues the original
 ## Official sources
 
 This repository (`Julien59247787/DCG-Crypto`, branch `dcg-3.0`) is the **official source** of DCG Core, maintained by the relaunch team.
-Only trust binaries published here, checked against the `SHA256SUMS` file of the release.
+Only trust binaries published here, checked against the `SHA256SUMS` file of the release and its signature `SHA256SUMS.asc`.
 
 | | |
 |---|---|
@@ -16,6 +16,7 @@ Only trust binaries published here, checked against the `SHA256SUMS` file of the
 | Explorer | https://explorer.dailycryptogiveaways.eu |
 | Discord | https://discord.gg/ZvHB9WRTwt |
 | Seed node | `seed.dailycryptogiveaways.eu:6744` |
+| Release signing key (GPG) | `E579 9640 87AE 4B7F C41C  8720 400B 5E10 CAB9 C6AE` ([contrib/gpg/dcg-release-signing-key.asc](contrib/gpg/dcg-release-signing-key.asc)) |
 | Network spork public key | `032f60ba8dfcc412635e411b7834789af646236146de3f3aebcf9935eeb997e35f` |
 
 Copies or forks of this code are not official, even if they use the DCG name. The old `crypto-giveaways.cash` domain no longer
